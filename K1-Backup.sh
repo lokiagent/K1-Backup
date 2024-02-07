@@ -106,11 +106,11 @@ if [ "$PAUSE" = 1 ]; then
     exit 0
 elif [ "$STOP" = 1 ]; then
     echo "Stopping automatic backups until manually restarted...."
-    chmod -x /etc/init.d/S52K1-Backup
+    mv /etc/init.d/S52K1-Backup /etc/init.d/disabled.S52K1-Backup
     exit 0
 elif [ "$RESUME" = 1 ]; then
     echo "Resuming automatic backups..."
-    chmod +x /etc/init.d/S52K1-Backup
+    mv /etc/init.d/disabled.S52K1-Backup /etc/init.d/S52K1-Backup
     exit 0
 elif [ "$INSTALL" = 1 ]; then
     # Install required packages using opkg
