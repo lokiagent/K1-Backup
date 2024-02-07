@@ -62,7 +62,7 @@ shelp() {
 }
 
 # Parse command-line arguments
-while getopts "iprsb:t:g:" option; do
+while getopts "iprsb:t:g:hn" option; do
     case "${option}" in
         i) INSTALL=1 ;;
         p) PAUSE=1 ;;
@@ -71,6 +71,10 @@ while getopts "iprsb:t:g:" option; do
         b) BRANCH="${OPTARG}" ;;
         t) TARGET="${OPTARG}" ;;
         g) REMOTE="${OPTARG}" ;;
+        h) 
+            shelp
+            exit 0
+            ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
             shelp
@@ -80,6 +84,10 @@ while getopts "iprsb:t:g:" option; do
             echo "Option -$OPTARG requires an argument." >&2
             shelp
             exit 1
+            ;;
+        *)
+            shelp
+            exit 0
             ;;
     esac
 done
