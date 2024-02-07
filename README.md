@@ -40,3 +40,15 @@ The following macros can be enabled to control K1-Backup service from Mainsail/F
 - BACKUP_RESUME
 
 To install the macros, ssh to the printer and input ```ln -s /usr/data/K1-Backup/backup_macro.cfg /usr/data/printer_data/config/backup_macro.cfg``` and add the line ```[include backup_macro.cfg]``` to your printer.cfg file.
+
+## Updates
+To keep the backup script up-to-date, you can this to your moonraker.conf file:
+```
+[update_manager K1-Backup]
+type: git_repo
+channel: dev
+path: /usr/data/K1-Backup
+origin: https://github.com/lokiagent/K1-Backup.git
+primary_branch: main
+is_system_service: false
+```

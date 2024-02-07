@@ -43,7 +43,7 @@ REMOTE=""
 BRANCH=""
 TARGET=""
 EVENTS="${EVENTS:-close_write,move,move_self,delete,create,modify}"
-SLEEP_TIME=10
+SLEEP_TIME=5
 DATE_FMT="+%Y-%m-%d %H:%M:%S"
 COMMITMSG="Scripted auto-commit on change (%d) by gitwatch.sh"
 SKIP_IF_MERGING=0
@@ -225,9 +225,9 @@ if [ -d "$TARGET" ]; then # if the target is a directory
 
   # construct inotifywait-commandline
   if [ "$(uname)" != "Darwin" ]; then
-    INW_ARGS="-mr -e $EVENTS $TARGETDIR"
+    INW_ARGS="-qmr -e $EVENTS $TARGETDIR"
   fi
- # GIT_ADD_ARGS="" # add "." (CWD) recursively to index
+  GIT_ADD="git add -A ." # add "." (CWD) recursively to index
   GIT_COMMIT_ARGS="-a"     # add -a switch to "commit" call just to be sure
 
 else
@@ -266,7 +266,7 @@ fi
 # main program loop: wait for changes and commit them
 # Custom timeout function
 timeout() {
-  sleep "$1" &
+  sleep "5" &
   timeout_pid=$!
   trap "kill $timeout_pid 2>/dev/null" EXIT
   wait $timeout_pid 2>/dev/null
@@ -274,42 +274,35 @@ timeout() {
 
 while true; do
   # Start inotifywait to monitor changes
-  while true; do
-    eval "$INW $INW_ARGS" | while read -r line; do
-      # Wait for changes with a custom timeout
-      timeout "$SLEEP_TIME"
+  eval "$INW $INW_ARGS" | while read -r line; do
+    # Check if there were any changes reported during the timeout period
+    if [ -n "$line" ]; then
+      # Process changes
+      if [ -n "$DATE_FMT" ]; then
+        COMMITMSG=$(echo "$COMMITMSG" | awk -v date="$(date "$DATE_FMT")" '{gsub(/%d/, date)}1') # splice the formatted date-time into the commit message
+      fi
 
-      # Check if there were any changes reported during the timeout period
-      if [ -n "$line" ]; then
-        # Process changes
-        if [ -n "$DATE_FMT" ]; then
-          COMMITMSG=$(echo "$COMMITMSG" | awk -v date="$(date "$DATE_FMT")" '{gsub(/%d/, date)}1') # splice the formatted date-time into the commit message
+      cd "$TARGETDIR" || {
+        stderr "Error: Can't change directory to '${TARGETDIR}'."
+        exit 6
+      }
+      STATUS=$($GIT status -s)
+      if [ -n "$STATUS" ]; then # only commit if status shows tracked changes.
+        if [ "$SKIP_IF_MERGING" -eq 1 ] && is_merging; then
+          echo "Skipping commit - repo is merging"
+          continue
         fi
 
-        cd "$TARGETDIR" || {
-          stderr "Error: Can't change directory to '${TARGETDIR}'."
-          exit 6
-        }
-        STATUS=$($GIT status -s)
-        if [ -n "$STATUS" ]; then # only commit if status shows tracked changes.
-          if [ "$SKIP_IF_MERGING" -eq 1 ] && is_merging; then
-            echo "Skipping commit - repo is merging"
-            continue
-          fi
+        $GIT_ADD # add file(s) to index
+        $GIT commit $GIT_COMMIT_ARGS -m "$COMMITMSG" # construct commit message and commit
 
-          $GIT add $GIT_ADD_ARGS # add file(s) to index
-          $GIT commit $GIT_COMMIT_ARGS -m "$COMMITMSG" # construct commit message and commit
-
-          if [ -n "$PUSH_CMD" ]; then
-            echo "Push command is $PUSH_CMD"
-            eval "$PUSH_CMD"
-          fi
+        if [ -n "$PUSH_CMD" ]; then
+          echo "Push command is $PUSH_CMD"
+          eval "$PUSH_CMD"
+          pkill 'inotifywait'
+          timeout
         fi
       fi
-      pkill 'inotifywait'
-      break
-    done
+    fi
   done
 done
-
-

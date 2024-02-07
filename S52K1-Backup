@@ -3,17 +3,19 @@
 case "$1" in
   start)
     echo "Starting K1 Backup..."
-    /usr/data/K1-Backup/K1-Backup.sh -t origin -b "$BRANCH" "$IFS" &
+    /usr/data/K1-Backup/K1-Backup.sh -b "$BRANCH" -t "$IFS" -g origin & > /dev/null
     ;;
   stop)
     echo "Stopping K1 Backup..."
-    pkill -f "backup"
+    pkill K1
+    pkill inotifywait
     ;;
   restart)
     echo "Restarting K1 Backup..."
-    pkill -f "backup"
+    pkill K1
+    pkill inotify
     sleep 1
-    /usr/data/K1-Backup/K1-Backup.sh -t origin -b "$BRANCH" "$IFS" &
+     /usr/data/K1-Backup/K1-Backup.sh -b "$BRANCH" -t "$IFS" -g origin & > /dev/null
     ;;
   *)
     Usage: $0 {start|stop|restart}
