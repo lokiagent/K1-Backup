@@ -7,13 +7,13 @@ case "$1" in
     ;;
   stop)
     echo "Stopping K1 Backup..."
-    pkill K1
+    pkill K1-Backup
     pkill inotifywait
     ;;
   restart)
     echo "Restarting K1 Backup..."
-    pkill K1
-    pkill inotify
+    pkill K1-Backup
+    pkill inotifywait
     sleep 1
      /usr/data/K1-Backup/K1-Backup.sh -b "$BRANCH" -t "$IFS" -g origin & > /dev/null
     ;;
