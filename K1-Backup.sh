@@ -154,10 +154,10 @@ elif [ "$INSTALL" = 1 ]; then
     echo ".env" > "$IFS/.gitignore"
     
     # Insert .env to S52gitwatch.sh and move to init.d
-    cp -f /usr/data/K1-Backup/S52backup /etc/init.d/S52backup
-    sed -i "2i source $IFS/.env" /etc/init.d/S52backup
-    chmod +x /etc/init.d/S52backup
-    /etc/init.d/S52backup start
+    cp -f /usr/data/K1-Backup/S52K1-Backup /etc/init.d/S52K1-Backup
+    sed -i "2i source $IFS/.env" /etc/init.d/S52K1-Backup
+    chmod +x /etc/init.d/S52K1-Backup
+    /etc/init.d/S52K1-Backup start
     
     echo "K1 Backup has been installed and configured."
     exit 0
