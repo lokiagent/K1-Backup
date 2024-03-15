@@ -1,10 +1,14 @@
 # K1-Backup
 Custom script to watch klipper configuration folder and automatically back up to github whenever a change is made in that directory.
 
-Credit to [gitwatch](https://github.com/gitwatch/gitwatch) for automatic watching and commit to github. Modified their script to work for busybox sh, specifically the Creality K1 & K1 Max.
+Credit to [gitwatch](https://github.com/gitwatch/gitwatch) for automatic watching and commit to github. Modified their script to work for busybox sh, specifically the Creality K1 series.
 This script uses inotifywait, part of the inotify-utils, and pkill. Packages will be installed during the installation process if not already installed.
 
 ## Installation
+### Creality Helper Script
+Installation can be done through [Guilouz' Creality Helper Script](https://guilouz.github.io/Creality-K1-Series/helper-script/git-backup/) in the installation menu under 'Git Backup'
+
+### Direct Installation
 First, create a new repository to direct your backups to. You will also need to create a personal access token. [Here is the process if you're unfamiliar.](https://docs.github.com/en/enterprise-server@3.9/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) Once you have your token, do not navigate away from the page, as you will not be able to see the token again.
 
 To install the script:
